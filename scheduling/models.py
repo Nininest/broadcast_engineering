@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-# Create your models here.
 
 class Meeting(models.Model):
     PLATFORM_CHOICES = [
         ('zoom', 'Zoom'),
         ('teams', 'Microsoft Teams'),
-        ('google_meet', 'Google Meet'), 
-        ('in_person', 'In Person'), 
+        ('google_meet', 'Google Meet'),
+        ('in_person', 'In Person'),
         ('slack', 'Slack Huddle'),
     ]
     title = models.CharField(max_length=200)
@@ -22,8 +21,7 @@ class Meeting(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} - {self.date_time.strftime('%d %b %Y %H:%M')}"
-    
+        return f"{self.title} — {self.date_time.strftime('%d %b %Y %H:%M')}"
+
     class Meta:
         ordering = ['date_time']
-    
