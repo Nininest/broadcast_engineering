@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Notifications</h4>
+<div class="card p-3" style="max-width:680px;">
+  {% for notif in notifications %}
+  <div class="d-flex align-items-start gap-3 p-2 border-bottom {% if not notif.read %}bg-light{% endif %}">
+    <i class="fas fa-bell mt-1 {% if notif.read %}text-muted{% else %}text-primary{% endif %}"></i>
+    <div class="flex-grow-1">
+      <div class="small {% if not notif.read %}fw-semibold{% endif %}">{{ notif.message }}</div>
+      <div class="text-muted" style="font-size:0.72rem;">{{ notif.created_at|timesince }} ago</div>
+    </div>
+    {% if notif.link %}<a href="{{ notif.link }}" class="btn btn-sm btn-outline-primary">View</a>{% endif %}
+  </div>
+  {% empty %}
+  <div class="text-center text-muted p-5"><i class="fas fa-bell-slash fa-2x mb-3 opacity-25 d-block"></i>No notifications yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}
