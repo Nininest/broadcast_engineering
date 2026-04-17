@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Teams{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h4 class="fw-bold mb-0">Teams</h4>
+    <p class="text-muted small mb-0">Browse and search all engineering teams</p>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card p-3 mb-3">
+  <form method="get" class="row g-2 align-items-end">
+    <div class="col-md-5">
+      <input type="text" name="q" class="form-control" placeholder="Search by name, purpose, or manager..." value="{{ query }}">
+    </div>
+    <div class="col-md-3">
+      <select name="dept" class="form-select">
+        <option value="">All Departments</option>
+        {% for dept in departments %}
+        <option value="{{ dept.id }}" {% if dept_filter == dept.id|stringformat:'s' %}selected{% endif %}>{{ dept.department_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Statuses</option>
+        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+        <option value="disbanded" {% if status_filter == 'disbanded' %}selected{% endif %}>Disbanded</option>
+        <option value="restructuring" {% if status_filter == 'restructuring' %}selected{% endif %}>Restructuring</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+</div>
+
+<!-- Category tabs -->
+<div class="mb-3">
+  <button class="btn btn-sm btn-outline-secondary me-1 active-filter" onclick="filterCards('all')">All</button>
+  <button class="btn btn-sm btn-outline-secondary me-1" onclick="filterCards('Engineering')">Engineering</button>
+  <button class="btn btn-sm btn-outline-secondary me-1" onclick="filterCards('Design')">Design</button>
+  <button class="btn btn-sm btn-outline-secondary" onclick="filterCards('Product')">Product</button>
+</div>
+
+<!-- Team cards -->
+<div class="row g-3">
+  {% for team in teams %}
+  <div class="col-md-6">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <h6 class="fw-bold mb-0">{{ team.team_name }}</h6>
+          <small class="text-muted">{{ team.department|default:"No Department" }}</small>
+        </div>
+        <span class="badge badge-{{ team.status }}">{{ team.get_status_display }}</span>
+      </div>
+      <p class="small text-muted mb-2">{{ team.team_purpose|truncatechars:100 }}</p>
+      {% if team.manager %}
+      <div class="small mb-2"><i class="fas fa-user-tie text-muted me-1"></i>{{ team.manager.get_full_name }}</div>
+      {% endif %}
+      <div class="small text-muted mb-3"><i class="fas fa-users me-1"></i>{{ team.members.count }} member{{ team.members.count|pluralize }}</div>
+      <div class="d-flex gap-2 mt-auto">
+        <a href="{% url 'team_detail' team.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+        {% if team.team_contactemail %}
+        <a href="{% url 'email_team' team.id %}" class="btn btn-sm btn-outline-secondary">
+          <i class="fas fa-envelope me-1"></i>Contact
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card p-5 text-center text-muted">
+      <i class="fas fa-search fa-2x mb-3 opacity-25"></i>
+      <p>No teams found. {% if query %}Try a different search term.{% endif %}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- "Want to join us?" footer -->
+<div class="text-center mt-4 pt-3 border-top">
+  <h6 class="text-muted">Want to join us?</h6>
+  <a href="{% url 'department_list' %}" class="btn btn-outline-primary btn-sm me-2">Learn about our departments</a>
+</div>
+{% endblock %}
