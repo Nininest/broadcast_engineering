@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<style>
+  .rep-stat {
+    background: #084070;
+    border-radius: 14px;
+    padding: 1.2rem 1rem;
+    color: #fff;
+    text-align: center;
+    height: 100%;
+  }
+  .rep-stat .num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+  .rep-stat .lbl {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .rep-stat.green  { background: #1a4d2e; }
+  .rep-stat.red    { background: #6b1010; }
+  .rep-stat.olive  { background: #4a4a00; }
+
+  .rep-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(4,42,74,0.07);
+    padding: 1.4rem;
+    height: 100%;
+  }
+  .rep-card-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #042A4A;
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid #f0f4f8;
+  }
+
+  .btn-pdf {
+    background: #DB4B4B;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-pdf:hover { background: #b73030; color: #fff; }
+
+  .btn-excel {
+    background: #30B35C;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .btn-excel:hover { background: #228a44; color: #fff; }
+
+  .dept-bar-bg {
+    height: 8px;
+    background: #e8eef4;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .dept-bar-fill {
+    height: 100%;
+    background: #042A4A;
+    border-radius: 20px;
+  }
+
+  .warn-box {
+    background: rgba(219,75,75,0.08);
+    border: 1px solid rgba(219,75,75,0.2);
+    color: #7a1010;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .ok-box {
+    background: rgba(48,179,92,0.08);
+    border: 1px solid rgba(48,179,92,0.2);
+    color: #1a5e35;
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .dl-link {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    border: 1.5px solid #e8eef4;
+    text-decoration: none;
+    margin-bottom: 0.7rem;
+    transition: background 0.18s, border-color 0.18s;
+    background: #fff;
+  }
+  .dl-link:hover { background: #f5f8fc; border-color: #3EB9E6; }
+  .dl-link .dl-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .dl-link .dl-title { font-size: 0.88rem; font-weight: 700; color: #042A4A; }
+  .dl-link .dl-sub   { font-size: 0.72rem; color: #aaa; margin-top: 0.1rem; }
+
+  .teams-table th {
+    background: #f0f4f8;
+    color: #042A4A;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border: none;
+    padding: 0.65rem 0.9rem;
+  }
+  .teams-table td {
+    font-size: 0.85rem;
+    color: #333;
+    vertical-align: middle;
+    padding: 0.65rem 0.9rem;
+    border-top: 1px solid #f0f4f8;
+  }
+  .badge-active  {
+    background: rgba(48,179,92,0.12);
+    color: #30B35C;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+  }
+  .badge-disband {
+    background: rgba(219,75,75,0.12);
+    color: #DB4B4B;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+  }
+  .badge-no-mgr {
+    background: rgba(189,193,75,0.15);
+    color: #7a7a00;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+  }
+
+  .generated-note {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-top: 0.2rem;
+  }
+</style>
+
+<!-- ── Page Header ── -->
+<div class="d-flex justify-content-between align-items-start mb-4">
+  <div>
+    <h4 class="fw-bold mb-0" style="color:#042A4A;">📋 Reports Centre</h4>
+    <p class="text-muted small mb-0">Generate and download engineering team reports</p>
+    <p class="generated-note">Last updated: {{ generated_at|date:"d M Y, H:i" }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'reports:pdf' %}" class="btn-pdf">📄 Download PDF</a>
+    <a href="{% url 'reports:excel' %}" class="btn-excel">📊 Download Excel</a>
+  </div>
+</div>
+
+<!-- ── Summary Stat Cards ── -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-2">
+    <div class="rep-stat">
+      <div class="num">{{ total_teams }}</div>
+      <div class="lbl">Total Teams</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="rep-stat green">
+      <div class="num">{{ active_teams|default:"0" }}</div>
+      <div class="lbl">Active</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="rep-stat red">
+      <div class="num">{{ disbanded_teams|default:"0" }}</div>
+      <div class="lbl">Disbanded</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="rep-stat olive">
+      <div class="num">{{ teams_without_managers }}</div>
+      <div class="lbl">No Manager</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="rep-stat">
+      <div class="num">{{ total_departments }}</div>
+      <div class="lbl">Departments</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="rep-stat">
+      <div class="num">{{ total_users|default:"0" }}</div>
+      <div class="lbl">Users</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Middle Row: Dept chart + Download links ── -->
+<div class="row g-3 mb-4">
+
+  <!-- Department breakdown bar chart -->
+  <div class="col-md-6">
+    <div class="rep-card">
+      <div class="rep-card-title">📊 Teams per Department</div>
+
+      {% if dept_stats %}
+        {% for dept in dept_stats %}
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1" style="font-size:0.85rem;">
+              <span style="color:#333; font-weight:500;">{{ dept.department_name }}</span>
+              <span style="color:#084070; font-weight:700;">{{ dept.team_count }} team{{ dept.team_count|pluralize }}</span>
+            </div>
+            <div class="dept-bar-bg">
+              {% if total_teams and total_teams > 0 %}
+                {% widthratio dept.team_count total_teams 100 as bar_pct %}
+                <div class="dept-bar-fill" style="width: {{ bar_pct }}%;"></div>
+                {% else %}
+                <div class="dept-bar-fill" style="width:0%;"></div>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted small">No departments found yet.</p>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Manager alert + download links -->
+  <div class="col-md-6">
+    <div class="rep-card">
+      <div class="rep-card-title">⚠️ Teams Without Managers</div>
+
+      {% if teams_without_managers > 0 %}
+        <div class="warn-box">
+          ⚠️ <strong>{{ teams_without_managers }}</strong>
+          team{{ teams_without_managers|pluralize }}
+          need{{ teams_without_managers|pluralize:"s," }} a manager assigned.
+        </div>
+      {% else %}
+        <div class="ok-box">
+          ✅ All teams currently have a manager assigned.
+        </div>
+      {% endif %}
+
+      <div class="rep-card-title mt-3">📥 Download Reports</div>
+
+      <a href="{% url 'reports:pdf' %}" class="dl-link">
+        <span class="dl-icon">📄</span>
+        <div>
+          <div class="dl-title">Full Teams Report — PDF</div>
+          <div class="dl-sub">Summary, all teams, teams without managers</div>
+        </div>
+      </a>
+
+      <a href="{% url 'reports:excel' %}" class="dl-link">
+        <span class="dl-icon">📊</span>
+        <div>
+          <div class="dl-title">Full Teams Report — Excel</div>
+          <div class="dl-sub">4 sheets: Summary, All Teams, No Manager, Departments</div>
+        </div>
+      </a>
+
+      <a href="{% url 'reports:departments' %}" class="dl-link">
+        <span class="dl-icon">🏛️</span>
+        <div>
+          <div class="dl-title">Department Breakdown</div>
+          <div class="dl-sub">View all departments and their teams</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── All Teams Table ── -->
+<div class="rep-card">
+  <div class="rep-card-title">
+    🏢 All Engineering Teams
+    <span style="background:#e8eef4; color:#084070; font-size:0.72rem;
+                 padding:0.2rem 0.6rem; border-radius:20px; margin-left:0.5rem;">
+      {{ total_teams }} total
+    </span>
+  </div>
+
+  {% if teams %}
+    <div class="table-responsive">
+      <table class="table teams-table mb-0">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Team Name</th>
+            <th>Department</th>
+            <th>Manager</th>
+            <th>Members</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team in teams %}
+            <tr>
+              <td style="color:#aaa;">{{ forloop.counter }}</td>
+              <td><strong>{{ team.name }}</strong></td>
+              <td>{{ team.department.name|default:"—" }}</td>
+              <td>
+                {% if team.manager %}
+                  {{ team.manager }}
+                {% else %}
+                  <span class="badge-no-mgr">⚠ Not Assigned</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if team.members %}
+                  {{ team.members.count }}
+                {% else %}
+                  0
+                {% endif %}
+              </td>
+              <td>
+                {% if team.manager %}
+                  <span class="badge-active">● Active</span>
+                {% else %}
+                  <span class="badge-disband">● No Manager</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="text-center py-4">
+      <div style="font-size:2.5rem; margin-bottom:0.5rem;">📭</div>
+      <p class="text-muted small">No teams found in the database yet.</p>
+      <p class="text-muted" style="font-size:0.75rem;">
+        Teams will appear here once added by the Teams module.
+      </p>
+    </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}
