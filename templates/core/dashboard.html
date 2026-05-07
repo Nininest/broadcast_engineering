@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-1">Welcome, {{ user.get_full_name|default:user.username }}</h4>
+<p class="text-muted small mb-4">Broadcast Engineering Teams Portal overview.</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num">{{ total_teams }}</div><div class="stat-label">Total Teams</div></div></div>
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num text-success">{{ active_teams }}</div><div class="stat-label">Active</div></div></div>
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num text-danger">{{ disbanded_teams }}</div><div class="stat-label">Disbanded</div></div></div>
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num">{{ total_engineers }}</div><div class="stat-label">Engineers</div></div></div>
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num">{{ total_departments }}</div><div class="stat-label">Departments</div></div></div>
+  <div class="col-md-2"><div class="stat-card"><div class="stat-num text-warning">{{ teams_no_manager }}</div><div class="stat-label">No Manager</div></div></div>
+</div>
+
+<div class="row g-3 mb-3">
+  <!-- dept chart -->
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-chart-bar me-2 text-primary"></i>Teams per Department</h6>
+      {% for dept in dept_stats %}
+      <div class="mb-2">
+        <div class="d-flex justify-content-between small mb-1"><span>{{ dept.department_name }}</span><span class="fw-semibold">{{ dept.tc }}</span></div>
+        <div class="progress" style="height:7px;"><div class="progress-bar" style="width:{% if total_teams %}{% widthratio dept.tc total_teams 100 %}{% else %}0{% endif %}%;background:#042A4A;"></div></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <!-- recent activity -->
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-clock me-2 text-warning"></i>Recent Activity</h6>
+      {% for log in recent_logs %}
+      <div class="d-flex gap-2 mb-2 pb-2 border-bottom">
+        <span class="badge bg-secondary" style="font-size:0.65rem;height:fit-content;margin-top:2px;">{{ log.action_type }}</span>
+        <div><div class="small">{{ log.description|default:"System action" }}</div><div class="text-muted" style="font-size:0.7rem;">{{ log.timestamp|timesince }} ago</div></div>
+      </div>
+      {% empty %}<p class="text-muted small">No recent activity.</p>{% endfor %}
+    </div>
+  </div>
+  <!-- recently updated teams -->
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-users me-2 text-success"></i>Recent Teams</h6>
+      {% for team in recent_teams %}
+      <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+        <div class="flex-grow-1"><a href="{% url 'team_detail' team.id %}" class="text-decoration-none small fw-semibold">{{ team.team_name }}</a><div class="text-muted" style="font-size:0.72rem;">{{ team.department|default:"—" }}</div></div>
+        <span class="badge-{{ team.status }}">{{ team.get_status_display }}</span>
+      </div>
+      {% empty %}<p class="text-muted small">No teams yet.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Quick links -->
+<div class="row g-2">
+  <div class="col-auto"><a href="{% url 'team_list' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-users me-1"></i>All Teams</a></div>
+  <div class="col-auto"><a href="{% url 'department_list' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-sitemap me-1"></i>Departments</a></div>
+  <div class="col-auto"><a href="{% url 'compose' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-envelope me-1"></i>New Message</a></div>
+  <div class="col-auto"><a href="{% url 'schedule_meeting' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-calendar-plus me-1"></i>Schedule Meeting</a></div>
+  <div class="col-auto"><a href="{% url 'reports_home' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-chart-bar me-1"></i>Reports</a></div>
+  <div class="col-auto"><a href="{% url 'org_chart' %}" class="btn btn-outline-primary btn-sm"><i class="fas fa-sitemap me-1"></i>Org Chart</a></div>
+</div>
+{% endblock %}
