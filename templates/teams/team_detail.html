@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}{{ team.team_name }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'team_list' %}">Teams</a></li><li class="breadcrumb-item active">{{ team.team_name }}</li></ol></nav>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">{{ team.team_name }}</h4>
+    <span class="badge-{{ team.status }} me-2">{{ team.get_status_display }}</span>
+    {% if team.department %}<span class="text-muted small">{{ team.department }}</span>{% endif %}
+    {% if team.team_type %}<span class="badge bg-light text-dark ms-2 small">{{ team.team_type }}</span>{% endif %}
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'schedule_team_meeting' team.id %}" class="btn btn-success btn-sm"><i class="fas fa-calendar-plus me-1"></i>Schedule Meeting</a>
+    {% if team.team_contactemail %}<a href="{% url 'email_team' team.id %}" class="btn btn-primary btn-sm"><i class="fas fa-envelope me-1"></i>Email Team</a>{% endif %}
+    <a href="{% url 'team_dependencies' team.id %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-project-diagram me-1"></i>Dependencies</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card p-3 mb-3">
+      <h6 class="fw-semibold mb-2">Mission & Purpose</h6>
+      <p class="mb-0">{{ team.team_purpose|default:"No description provided." }}</p>
+    </div>
+    <div class="card p-3 mb-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-users me-2"></i>Team Members ({{ members.count }})</h6>
+      {% for member in members %}
+      <div class="d-flex align-items-center gap-3 mb-2 pb-2 border-bottom">
+        <div style="width:36px;height:36px;border-radius:50%;background:#042A4A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:600;flex-shrink:0;">{{ member.user.first_name.0 }}{{ member.user.last_name.0 }}</div>
+        <div>
+          <div class="fw-semibold small">{{ member.user.get_full_name }}</div>
+          <div class="text-muted" style="font-size:0.75rem;">{{ member.role_in_team }}</div>
+          {% if member.skills %}<div class="text-muted" style="font-size:0.72rem;"><i class="fas fa-tools me-1"></i>{{ member.skills }}</div>{% endif %}
+        </div>
+      </div>
+      {% empty %}<p class="text-muted small">No members recorded.</p>{% endfor %}
+    </div>
+    <div class="card p-3 mb-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-code-branch me-2"></i>Code Repositories</h6>
+      {% for repo in repos %}<div class="d-flex align-items-center gap-2 mb-2"><i class="fas fa-folder text-muted"></i><a href="{{ repo.repo_uri }}" target="_blank" class="small">{{ repo.repo_name }}</a></div>
+      {% empty %}<p class="text-muted small">No repositories.</p>{% endfor %}
+    </div>
+    {% if upcoming_meetings %}
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-3"><i class="fas fa-calendar-alt me-2 text-success"></i>Upcoming Meetings</h6>
+      {% for m in upcoming_meetings %}
+      <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+        <div class="flex-grow-1"><a href="{% url 'meeting_detail' m.id %}" class="small fw-semibold text-decoration-none">{{ m.title }}</a><div class="text-muted" style="font-size:0.72rem;"><i class="fas fa-clock me-1"></i>{{ m.date_time|date:"d M Y H:i" }} — {{ m.get_platform_display }}</div></div>
+      </div>
+      {% endfor %}
+      <a href="{% url 'schedule_team_meeting' team.id %}" class="btn btn-outline-success btn-sm mt-1">+ Schedule Meeting</a>
+    </div>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3 mb-3">
+      <h6 class="fw-semibold mb-2">Manager</h6>
+      {% if team.manager %}
+      <div class="d-flex align-items-center gap-2">
+        <div style="width:32px;height:32px;border-radius:50%;background:#084070;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;">{{ team.manager.first_name.0 }}{{ team.manager.last_name.0 }}</div>
+        <div><div class="small fw-semibold">{{ team.manager.get_full_name }}</div><div class="text-muted" style="font-size:0.72rem;">{{ team.manager.email }}</div></div>
+      </div>
+      {% else %}<p class="text-muted small text-danger">No manager assigned.</p>{% endif %}
+    </div>
+    <div class="card p-3 mb-3">
+      <h6 class="fw-semibold mb-2">Contact Channels</h6>
+      {% for ch in channels %}<div class="mb-1 small"><span class="badge bg-light text-dark">{{ ch.get_channel_type_display }}</span> {{ ch.contact_value }}</div>
+      {% empty %}<p class="text-muted small">No contact channels.</p>{% endfor %}
+    </div>
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-2">Dependencies</h6>
+      {% if upstream %}<div class="mb-2"><small class="text-muted fw-semibold d-block">UPSTREAM</small>{% for dep in upstream %}<div><a href="{% url 'team_detail' dep.depends_on.id %}" class="small">↑ {{ dep.depends_on.team_name }}</a></div>{% endfor %}</div>{% endif %}
+      {% if downstream %}<div><small class="text-muted fw-semibold d-block">DOWNSTREAM</small>{% for dep in downstream %}<div><a href="{% url 'team_detail' dep.depends_on.id %}" class="small">↓ {{ dep.depends_on.team_name }}</a></div>{% endfor %}</div>{% endif %}
+      {% if not upstream and not downstream %}<p class="text-muted small">No dependencies.</p>{% endif %}
+      <a href="{% url 'team_dependencies' team.id %}" class="btn btn-outline-secondary btn-sm mt-2 w-100">View Graph</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
