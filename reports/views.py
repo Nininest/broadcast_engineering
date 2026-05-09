@@ -209,7 +209,7 @@ def generate_pdf_report(request):
         ('GRID', (0,0),(-1,-1),0.5, colors.HexColor('#9fa8da')),
         ('LEFTPADDING', (0,0),(-1,-1), 8),
         ('RIGHTPADDING', (0,0),(-1,-1),8),
-        ('TOPPADDING' (0,0),(-1,-1),6),
+        ('TOPPADDING', (0,0),(-1,-1),6),
         ('BOTTOMPADDING', (0,0),(-1,-1),6),
     ]))
     story.append(summary_table)
