@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}{{ team_type.name }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'department_list' %}">Organisation</a></li><li class="breadcrumb-item active">{{ team_type.name }}</li></ol></nav>
+<h4 class="fw-bold mb-1">{{ team_type.name }}</h4>
+<p class="text-muted small mb-4">{{ team_type.description|default:"Team type details" }}</p>
+<h6 class="fw-semibold mb-3">Teams of this type ({{ teams.count }})</h6>
+<div class="row g-2">
+{% for team in teams %}
+<div class="col-md-6">
+  <div class="card p-3">
+    <div class="d-flex justify-content-between mb-1">
+      <h6 class="mb-0 small fw-bold">{{ team.team_name }}</h6>
+      <span class="badge-{{ team.status }}">{{ team.get_status_display }}</span>
+    </div>
+    <p class="small text-muted mb-2">{{ team.team_purpose|truncatechars:80 }}</p>
+    <a href="{% url 'team_detail' team.id %}" class="btn btn-sm btn-outline-primary">Details</a>
+  </div>
+</div>
+{% empty %}<div class="col-12"><p class="text-muted">No teams of this type.</p></div>{% endfor %}
+</div>
+{% endblock %}
