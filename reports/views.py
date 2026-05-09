@@ -105,7 +105,7 @@ def reports_dashboard(request):
         'generated_at' : data['generated_at'],
     }
 
-    return render(request, 'reports/dashboard.html', context)
+    return render(request, 'reports/reports_home.html', context)
 
 
 #-----------------------------------------------------
