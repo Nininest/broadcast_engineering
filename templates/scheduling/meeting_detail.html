@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ meeting.title }}{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'schedule_list' %}">Schedule</a></li><li class="breadcrumb-item active">{{ meeting.title }}</li></ol></nav>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0">{{ meeting.title }}</h4>
+  {% if meeting.organiser == request.user %}
+  <a href="{% url 'delete_meeting' meeting.id %}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete?')"><i class="fas fa-trash me-1"></i>Delete</a>
+  {% endif %}
+</div>
+<div class="row g-3">
+  <div class="col-md-8">
+    <div class="card p-4 mb-3">
+      <div class="row g-2 mb-3">
+        <div class="col-md-6"><small class="text-muted d-block">Date & Time</small><strong>{{ meeting.date_time|date:"l, d F Y" }} at {{ meeting.date_time|time:"H:i" }}</strong></div>
+        <div class="col-md-6"><small class="text-muted d-block">Platform</small><strong>{{ meeting.get_platform_display }}</strong></div>
+      </div>
+      {% if meeting.meeting_link %}
+      <div class="mb-3"><small class="text-muted d-block">Meeting Link</small><a href="{{ meeting.meeting_link }}" target="_blank" class="btn btn-success btn-sm mt-1"><i class="fas fa-video me-1"></i>Join Meeting</a></div>
+      {% endif %}
+      {% if meeting.team %}
+      <div class="mb-3"><small class="text-muted d-block">Team</small><a href="{% url 'team_detail' meeting.team.id %}">{{ meeting.team.team_name }}</a></div>
+      {% endif %}
+      {% if meeting.agenda %}
+      <div><small class="text-muted d-block mb-1">Agenda</small><p style="white-space:pre-wrap;">{{ meeting.agenda }}</p></div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-2">Organiser</h6>
+      <div class="d-flex align-items-center gap-2 mb-3 pb-3 border-bottom">
+        <div style="width:32px;height:32px;border-radius:50%;background:#042A4A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;">{{ meeting.organiser.first_name.0 }}{{ meeting.organiser.last_name.0 }}</div>
+        <div class="small fw-semibold">{{ meeting.organiser.get_full_name }}</div>
+      </div>
+      <h6 class="fw-semibold mb-2">Attendees ({{ meeting.attendees.count }})</h6>
+      {% for att in meeting.attendees.all %}
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <div style="width:28px;height:28px;border-radius:50%;background:#084070;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.7rem;">{{ att.first_name.0 }}{{ att.last_name.0 }}</div>
+        <span class="small">{{ att.get_full_name }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
