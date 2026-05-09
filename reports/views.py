@@ -69,7 +69,7 @@ def get_report_data():
     #Teams with no manager assigned
     #Ajust field name 'manager' to match group's actual Team model field
     teams_no_manager = teams.filter(
-        Q(manager__isnull = True) | Q(manager='')
+        Q(manager__isnull = True) | Q(manager__isnull=True)
     )
 
     return {
