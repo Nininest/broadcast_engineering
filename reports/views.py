@@ -64,7 +64,7 @@ def get_report_data():
         }
     
     teams = Team.objects.select_related('department', 'manager').all()
-    departments = Department.objects.annotate(team_count = Count('team')).all()
+    departments = Department.objects.annotate(team_count = Count('teams')).all()
 
     #Teams with no manager assigned
     #Ajust field name 'manager' to match group's actual Team model field
