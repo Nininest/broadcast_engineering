@@ -232,3 +232,6 @@ def generate_excel_report(request):
     )
     response['Content-Disposition'] = 'attachment; filename="broadcast_teams_report.xlsx"'
     return response
+
+def reports_dashboard(request):
+    return render(request, 'reports/dashboard.html')
