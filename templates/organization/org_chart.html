@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Organisation Chart{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Organisation Chart</h4>
+<div class="card p-4">
+{% for dept in departments %}
+<div class="mb-4">
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <div style="width:40px;height:40px;border-radius:8px;background:#042A4A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;">{{ dept.department_name.0 }}</div>
+    <div>
+      <strong>{{ dept.department_name }}</strong>
+      {% if dept.department_head %}<span class="text-muted small ms-2">— {{ dept.department_head.get_full_name }}</span>{% endif %}
+    </div>
+    <span class="badge bg-secondary ms-auto">{{ dept.teams.count }} teams</span>
+  </div>
+  <div class="ms-4 ps-3 border-start" style="border-color:#042A4A!important;">
+    {% for team in dept.teams.all %}
+    <div class="d-flex align-items-center gap-2 mb-1 py-1">
+      <i class="fas fa-users text-muted" style="font-size:0.75rem;"></i>
+      <a href="{% url 'team_detail' team.id %}" class="small text-decoration-none">{{ team.team_name }}</a>
+      <span class="badge badge-{{ team.status }} ms-1" style="font-size:0.65rem;">{{ team.get_status_display }}</span>
+      <span class="text-muted ms-auto" style="font-size:0.72rem;">{{ team.members.count }} members</span>
+    </div>
+    {% empty %}
+    <div class="text-muted small">No teams</div>
+    {% endfor %}
+  </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}
