@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Schedule Meeting{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'schedule_list' %}">Schedule</a></li><li class="breadcrumb-item active">New Meeting</li></ol></nav>
+<h4 class="fw-bold mb-4">Schedule a Meeting</h4>
+<div class="card p-4" style="max-width:680px;">
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3"><label class="form-label small fw-semibold">Meeting Title *</label><input type="text" name="title" class="form-control" placeholder="e.g. Sprint Planning, Team Sync..." required></div>
+    <div class="row g-2 mb-3">
+      <div class="col-md-6"><label class="form-label small fw-semibold">Date & Time *</label><input type="datetime-local" name="date_time" class="form-control" required></div>
+      <div class="col-md-6"><label class="form-label small fw-semibold">Platform</label>
+        <select name="platform" class="form-select">{% for val, label in platforms %}<option value="{{ val }}">{{ label }}</option>{% endfor %}</select>
+      </div>
+    </div>
+    <div class="mb-3"><label class="form-label small fw-semibold">Meeting Link</label><input type="url" name="meeting_link" class="form-control" placeholder="https://zoom.us/j/..."></div>
+    <div class="mb-3"><label class="form-label small fw-semibold">Team (optional)</label>
+      <select name="team" class="form-select">
+        <option value="">No specific team</option>
+        {% for team in teams %}<option value="{{ team.id }}" {% if preselected_team == team.id|stringformat:'s' %}selected{% endif %}>{{ team.team_name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="mb-3"><label class="form-label small fw-semibold">Attendees</label>
+      <select name="attendees" class="form-select" multiple size="5">{% for user in users %}<option value="{{ user.id }}">{{ user.get_full_name }} (@{{ user.username }})</option>{% endfor %}</select>
+      <div class="form-text">Hold Ctrl/Cmd to select multiple. You are added automatically.</div>
+    </div>
+    <div class="mb-3"><label class="form-label small fw-semibold">Agenda</label><textarea name="agenda" class="form-control" rows="4" placeholder="Meeting agenda / notes..."></textarea></div>
+    <button type="submit" class="btn btn-primary"><i class="fas fa-calendar-check me-1"></i>Schedule Meeting</button>
+    <a href="{% url 'schedule_list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+  </form>
+</div>
+{% endblock %}

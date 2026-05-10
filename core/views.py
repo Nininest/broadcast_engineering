@@ -1,7 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+<<<<<<< HEAD
 from django.contrib.autj.decorators import login_required
 from django.db.models import Count
 from teams.model import Team
+=======
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
+from teams.models import Team
+>>>>>>> 1bbd6c5 (Initial project setup)
 from organization.models import Department
 from core.models import AuditLog, Notification
 from django.contrib.auth.models import User
@@ -38,4 +44,8 @@ def dashboard_view(request):
 def notifications_views(request):
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
     Notification.objects.filter(user=request.user, read=False).update(read=True)
+<<<<<<< HEAD
     return render(request, 'core/notifications.html', {'notifications':notifications})
+=======
+    return render(request, 'core/notifications.html', {'notifications':notifications})
+>>>>>>> 1bbd6c5 (Initial project setup)

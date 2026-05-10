@@ -1,9 +1,20 @@
 {% extends 'base.html' %}
+<<<<<<< HEAD
 {% block title %}Dependency Graph{% endblock %}
 {% block content %}
 <h4 class="fw-bold mb-4">Global Dependency Graph</h4>
 <div class="row g-3">
   <div class="col-md-4">
+=======
+{% block title %}Dependency Graph{% endblock title %}
+
+{% block content %}
+<h4 class="fw-bold mb-4">Global Dependency Graph</h4>
+
+<div class="row g-3">
+
+  <div class="col-md-4" style="max-height:75vh; overflow-y:auto;">
+>>>>>>> 1bbd6c5 (Initial project setup)
     <div class="card p-3">
       <h6 class="fw-semibold mb-3">All Dependencies</h6>
       {% for dep in dependencies %}
@@ -18,6 +29,7 @@
       {% endfor %}
     </div>
   </div>
+<<<<<<< HEAD
   <div class="col-md-8">
     <div class="card p-4" style="background:#1a1a2e; min-height:400px;">
       <h6 class="text-white mb-3">Visual Graph</h6>
@@ -27,3 +39,139 @@
   </div>
 </div>
 {% endblock %}
+=======
+
+  <div class="col-md-8">
+    <div class="card p-3" style="background:#0d2744; min-height:75vh;">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0" style="color:#ffffff; font-family:Georgia,serif; letter-spacing:3px; font-weight:700;">DEPENDENCIES</h5>
+        <span style="color:#ffffff88; font-size:0.8rem;">Drag nodes &middot; Scroll to zoom</span>
+      </div>
+      <div id="dep-graph" style="width:100%; height:65vh; border-radius:8px; background:#0d2744;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Django data passed safely as JSON — no Django tags inside JS -->
+<script type="application/json" id="dep-data">
+[{% for dep in dependencies %}{"fromId":{{ dep.team.id }},"fromLabel":"{{ dep.team.team_name|escapejs }}","toId":{{ dep.depends_on.id }},"toLabel":"{{ dep.depends_on.team_name|escapejs }}","type":"{{ dep.dependency_type|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]
+</script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
+
+<script type="text/javascript">
+(function() {
+
+  var rawDeps = JSON.parse(document.getElementById('dep-data').textContent);
+
+  var COLORS = [
+    { bg: '#38bdf8', text: '#0c2d4a' },
+    { bg: '#a78bfa', text: '#2e1065' },
+    { bg: '#fbbf24', text: '#451a03' },
+    { bg: '#4ade80', text: '#052e16' },
+    { bg: '#f87171', text: '#450a0a' },
+    { bg: '#f1f5f9', text: '#1e293b' },
+    { bg: '#fb923c', text: '#431407' },
+    { bg: '#34d399', text: '#022c22' },
+    { bg: '#818cf8', text: '#1e1b4b' },
+    { bg: '#f472b6', text: '#4a044e' },
+    { bg: '#facc15', text: '#422006' },
+    { bg: '#22d3ee', text: '#083344' }
+  ];
+
+  var colorIndex = 0;
+  var colorAssign = {};
+
+  function getColor(label) {
+    if (!colorAssign[label]) {
+      colorAssign[label] = COLORS[colorIndex % COLORS.length];
+      colorIndex++;
+    }
+    return colorAssign[label];
+  }
+
+  var nodeMap = {};
+  var edgeList = [];
+
+  function addNode(id, label) {
+    if (nodeMap[id]) { return; }
+    var c = getColor(label);
+    var short = label.length > 14 ? label.slice(0, 13) + '\u2026' : label;
+    nodeMap[id] = {
+      id: id,
+      label: short,
+      title: label,
+      shape: 'dot',
+      size: 36,
+      color: {
+        background: c.bg,
+        border: c.bg,
+        highlight: { background: '#ffffff', border: c.bg },
+        hover: { background: '#ffffff', border: c.bg }
+      },
+      font: { color: c.text, size: 13, face: 'sans-serif', bold: true }
+    };
+  }
+
+  rawDeps.forEach(function(d) {
+    addNode(d.fromId, d.fromLabel);
+    addNode(d.toId, d.toLabel);
+    edgeList.push({
+      from:   d.fromId,
+      to:     d.toId,
+      arrows: 'to',
+      color:  { color: '#ffffff66', highlight: '#ffffff', hover: '#ffffffcc' },
+      width:  1.5,
+      title:  d.type,
+      label:  d.type,
+      font:   { color: '#ffffffaa', size: 11, align: 'middle' },
+      smooth: { type: 'curvedCW', roundness: 0.15 }
+    });
+  });
+
+  var container = document.getElementById('dep-graph');
+
+  if (Object.keys(nodeMap).length === 0) {
+    container.innerHTML = '<p style="color:#aaa; padding:2rem; text-align:center;">No dependency data.<br>Add dependencies to see the graph.</p>';
+    return;
+  }
+
+  try {
+    new vis.Network(
+      container,
+      {
+        nodes: new vis.DataSet(Object.values(nodeMap)),
+        edges: new vis.DataSet(edgeList)
+      },
+      {
+        layout: { improvedLayout: true },
+        physics: {
+          solver: 'forceAtlas2Based',
+          forceAtlas2Based: {
+            gravitationalConstant: -80,
+            springLength: 140,
+            springConstant: 0.05,
+            damping: 0.6
+          },
+          stabilization: { iterations: 300 }
+        },
+        interaction: {
+          hover: true,
+          tooltipDelay: 100,
+          navigationButtons: true,
+          keyboard: true
+        }
+      }
+    );
+  } catch(err) {
+    console.error('vis.Network error:', err);
+    container.innerHTML = '<p style="color:#f87171; padding:2rem; text-align:center;">Failed to render graph.</p>';
+  }
+
+}());
+</script>
+
+{% endblock content %}
+>>>>>>> 1bbd6c5 (Initial project setup)
