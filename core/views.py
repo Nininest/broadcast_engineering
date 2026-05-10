@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.autj.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from teams.model import Team
+from teams.models import Team
 from organization.models import Department
 from core.models import AuditLog, Notification
 from django.contrib.auth.models import User
