@@ -76,11 +76,11 @@ broadcast_engineering/
 │
 ├── accounts/                   # User auth, registration, login, profile (GROUP)
 ├── core/                       # Shared base templates, navbar (GROUP)
-├── organization/               # Student 2 – Departments, org structure
-├── teams/                      # Student 1 – Teams feature
-├── messaging/                  # Student 3 – Internal messaging
-├── schedule/                   # Student 4 – Meeting scheduler
-└── reports/                    # Student 5 – PDF/Excel reports
+├── organization/               # Sushma – Departments, org structure
+├── teams/                      # Yujala – Teams feature
+├── messaging/                  # Nistha – Internal messaging
+├── schedule/                   # Swekchhya – Meeting scheduler
+└── reports/                    # Palisha – PDF/Excel reports
 ```
 
 ---
