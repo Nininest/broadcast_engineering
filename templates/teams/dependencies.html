@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Dependencies - {{ team.team_name }}{% endblock %}
+{% block extra_css %}
+<style>
+.dep-node { display:inline-flex; align-items:center; justify-content:center; width:80px; height:80px; border-radius:50%; font-size:0.7rem; font-weight:600; text-align:center; cursor:pointer; transition:transform 0.2s; }
+.dep-node:hover { transform:scale(1.1); }
+.dep-center { background:#042A4A; color:#fff; }
+.dep-upstream { background:#d4edda; color:#155724; border:2px solid #28a745; }
+.dep-downstream { background:#d1ecf1; color:#0c5460; border:2px solid #17a2b8; }
+</style>
+{% endblock %}
+{% block content %}
+<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'team_list' %}">Teams</a></li><li class="breadcrumb-item"><a href="{% url 'team_detail' team.id %}">{{ team.team_name }}</a></li><li class="breadcrumb-item active">Dependencies</li></ol></nav>
+
+<h4 class="fw-bold mb-1">DEPENDENCIES</h4>
+<p class="text-muted small mb-4">Upstream and downstream relationships for <strong>{{ team.team_name }}</strong></p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-2">Filters</h6>
+      <select class="form-select form-select-sm mb-2"><option>All Departments</option></select>
+      <select class="form-select form-select-sm mb-2"><option>All Types</option><option>Upstream</option><option>Downstream</option></select>
+      <hr>
+      <h6 class="fw-semibold mb-2">Legends</h6>
+      <div class="small"><span style="display:inline-block;width:12px;height:12px;background:#042A4A;border-radius:50%;margin-right:6px;"></span>Current Team</div>
+      <div class="small mt-1"><span style="display:inline-block;width:12px;height:12px;background:#28a745;border-radius:50%;margin-right:6px;"></span>Upstream</div>
+      <div class="small mt-1"><span style="display:inline-block;width:12px;height:12px;background:#17a2b8;border-radius:50%;margin-right:6px;"></span>Downstream</div>
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card p-4" style="min-height:350px;background:#1a1a2e;">
+      <div class="d-flex flex-column align-items-center gap-3">
+        <!-- Upstream row -->
+        {% if upstream %}
+        <div class="d-flex gap-4">
+          {% for dep in upstream %}
+          <div class="text-center">
+            <a href="{% url 'team_detail' dep.depends_on.id %}" class="dep-node dep-upstream text-decoration-none">{{ dep.depends_on.team_name }}</a>
+            <div class="text-white small mt-1" style="font-size:0.65rem;">↑ Upstream</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        <!-- Center node -->
+        <div class="dep-node dep-center">{{ team.team_name }}</div>
+        <!-- Downstream row -->
+        {% if downstream %}
+        <div class="d-flex gap-4">
+          {% for dep in downstream %}
+          <div class="text-center">
+            <a href="{% url 'team_detail' dep.depends_on.id %}" class="dep-node dep-downstream text-decoration-none">{{ dep.depends_on.team_name }}</a>
+            <div class="text-white small mt-1" style="font-size:0.65rem;">↓ Downstream</div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if not upstream and not downstream %}
+        <p class="text-white-50 mt-5">No dependencies recorded for this team.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

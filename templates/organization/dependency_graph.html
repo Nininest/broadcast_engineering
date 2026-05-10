@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Dependency Graph{% endblock %}
+{% block content %}
+<h4 class="fw-bold mb-4">Global Dependency Graph</h4>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card p-3">
+      <h6 class="fw-semibold mb-3">All Dependencies</h6>
+      {% for dep in dependencies %}
+      <div class="d-flex align-items-center gap-2 mb-2 pb-2 border-bottom">
+        <a href="{% url 'team_detail' dep.team.id %}" class="small text-decoration-none fw-semibold">{{ dep.team.team_name }}</a>
+        <span class="badge {% if dep.dependency_type == 'upstream' %}bg-success{% else %}bg-info text-dark{% endif %}" style="font-size:0.65rem;">{{ dep.dependency_type }}</span>
+        <i class="fas fa-arrow-right text-muted mx-1 small"></i>
+        <a href="{% url 'team_detail' dep.depends_on.id %}" class="small text-decoration-none">{{ dep.depends_on.team_name }}</a>
+      </div>
+      {% empty %}
+      <p class="text-muted small">No dependencies recorded.</p>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card p-4" style="background:#1a1a2e; min-height:400px;">
+      <h6 class="text-white mb-3">Visual Graph</h6>
+      <canvas id="depChart"></canvas>
+      <p class="text-white-50 text-center mt-4 small">Team dependency visualisation — data populated from database</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

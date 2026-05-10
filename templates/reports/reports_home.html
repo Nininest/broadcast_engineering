@@ -182,8 +182,8 @@
     <p class="generated-note">Last updated: {{ generated_at|date:"d M Y, H:i" }}</p>
   </div>
   <div class="d-flex gap-2">
-    <a href="{% url 'reports:pdf' %}" class="btn-pdf">📄 Download PDF</a>
-    <a href="{% url 'reports:excel' %}" class="btn-excel">📊 Download Excel</a>
+    <a href="{% url 'report_pdf' %}" class="btn-pdf">📄 Download PDF</a>
+    <a href="{% url 'report_excel' %}" class="btn-excel">📊 Download Excel</a>
   </div>
 </div>
 
@@ -278,7 +278,7 @@
 
       <div class="rep-card-title mt-3">📥 Download Reports</div>
 
-      <a href="{% url 'reports:pdf' %}" class="dl-link">
+      <a href="{% url 'report_pdf' %}" class="dl-link">
         <span class="dl-icon">📄</span>
         <div>
           <div class="dl-title">Full Teams Report — PDF</div>
@@ -286,7 +286,7 @@
         </div>
       </a>
 
-      <a href="{% url 'reports:excel' %}" class="dl-link">
+      <a href="{% url 'report_excel' %}" class="dl-link">
         <span class="dl-icon">📊</span>
         <div>
           <div class="dl-title">Full Teams Report — Excel</div>
@@ -294,7 +294,7 @@
         </div>
       </a>
 
-      <a href="{% url 'reports:departments' %}" class="dl-link">
+      <a href="{% url 'reports_home' %}" class="dl-link">
         <span class="dl-icon">🏛️</span>
         <div>
           <div class="dl-title">Department Breakdown</div>
